@@ -14,16 +14,7 @@ class Database(metaclass=DatabaseMeta):
         self.created_at = datetime.now()
         self.created_by = 'admin'
 
-        self._data = {
-            'hello': 'world',
-            'foo': None,
-            'bar': {
-                'baz': [1, 2, 3],
-                'hello': {
-                    'world': [1, 2]
-                }
-            }
-        }
+        self._data = {}
 
     @classmethod
     def from_id(cls, _id):
