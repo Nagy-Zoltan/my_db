@@ -15,7 +15,7 @@ class Server:
 
         self.clients = []
 
-    def _accept(self, max_clients: int = 16):
+    def _start(self, max_clients: int = 16):
         print(f'Accepting clients at {self.ip}:{self.port}')
         while len(self.clients) < max_clients:
             sock_obj, sock = self._sock.accept()
@@ -25,8 +25,8 @@ class Server:
 
             self.serve_client(client=client)
 
-    def accept(self):
-        threading.Thread(target=self._accept, args=()).start()
+    def start(self):
+        threading.Thread(target=self._start, args=()).start()
 
     @staticmethod
     def _serve_client(client: Client):

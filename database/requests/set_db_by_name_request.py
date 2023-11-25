@@ -13,6 +13,7 @@ class SetDBByNameRequest(AbstractRequest):
         try:
             database = Database.name_to_db[self.name]
             self.client.db = database
+            return repr(database)
         except KeyError:
             return DB_NOT_EXIST
 

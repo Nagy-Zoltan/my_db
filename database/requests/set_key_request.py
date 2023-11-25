@@ -1,4 +1,5 @@
 from database.requests.abstract_request import AbstractRequest
+from database.requests.consts import DB_NOT_SET
 
 
 class SetKeyRequest(AbstractRequest):
@@ -10,7 +11,7 @@ class SetKeyRequest(AbstractRequest):
 
     def execute(self, db=None):
         if self.db is None and db is None:
-            raise RuntimeError('Please specify db to set key in.')
+            return DB_NOT_SET
         if db is None:
             db = self.db
         else:
@@ -18,4 +19,7 @@ class SetKeyRequest(AbstractRequest):
         return db.set_data(key=self.key, val=self.val)
 
     def __repr__(self):
-        return f'SetKeyRequest(db={self.db.name}, key={self.key}, val={self.val})'
+        if self.db is not None:
+            return f'SetKeyRequest(db={self.db.name}, key={self.key}, val={self.val})'
+        else:
+            return f'SetKeyRequest(db={None}, key={self.key}, val={self.val})'

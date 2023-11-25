@@ -7,4 +7,4 @@ from network.server import Server
 server = Server('localhost', 1234)
 
 
-server.accept()
+server.start()

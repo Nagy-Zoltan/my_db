@@ -13,6 +13,7 @@ class SetDBByIDRequest(AbstractRequest):
         try:
             database = Database.id_to_db[self.id]
             self.client.db = database
+            return repr(database)
         except KeyError:
             return DB_NOT_EXIST
 

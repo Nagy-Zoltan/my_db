@@ -10,17 +10,19 @@ from database.requests.set_key_request import SetKeyRequest
 
 class RequestParser:
 
+    _KEY_PATTERN = r'\w+(.\w+)*'
+
     PATTERNS = {
         RequestType.CREATE_DB: re.compile(r'^[dD][bB] [cC][rR][eE][aA][tT][eE] \w+$'),
         RequestType.SET_DB_BY_ID: re.compile(r'^[dD][bB] [iI][dD] \d+$'),
         RequestType.SET_DB_BY_NAME: re.compile(r'^[dD][bB] [nN][aA][mM][eE] \w+$'),
-        RequestType.GET_KEY_FROM_DB: re.compile(r'^[gG][eE][tT] \w[.\w]\w+$'),
-        RequestType.SET_KEY_IN_DB: re.compile(r'^[sS][eE][tT] \w[.\w]+\w .+?$')
+        RequestType.GET_KEY_FROM_DB: re.compile(fr'^[gG][eE][tT] {_KEY_PATTERN}$'),
+        RequestType.SET_KEY_IN_DB: re.compile(fr'^[sS][eE][tT] {_KEY_PATTERN} .+?$')
     }
 
     def get_request_type(self, request_string):
         for request_type, pattern in self.PATTERNS.items():
-            if re.match(pattern, request_string):
+            if re.fullmatch(pattern, request_string):
                 return request_type
 
     def get_request_obj(self, client, request_string: str):

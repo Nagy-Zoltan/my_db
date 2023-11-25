@@ -1,4 +1,5 @@
 from database.requests.abstract_request import AbstractRequest
+from database.requests.consts import DB_NOT_SET
 
 
 class GetKeyRequest(AbstractRequest):
@@ -9,12 +10,15 @@ class GetKeyRequest(AbstractRequest):
 
     def execute(self, db=None):
         if self.db is None and db is None:
-            raise RuntimeError('Please specify db to get key from.')
+            return DB_NOT_SET
         if db is None:
             db = self.db
         else:
             self.db = db
-        return db.get_data(key=self.key)
+        return str(db.get_data(key=self.key))
 
     def __repr__(self):
-        return f'GetKeyRequest(db={self.db.name}, key={self.key})'
+        if self.db is not None:
+            return f'GetKeyRequest(db={self.db.name}, key={self.key})'
+        else:
+            return f'GetKeyRequest(db={None}, key={self.key})'
