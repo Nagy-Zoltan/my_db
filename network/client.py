@@ -7,6 +7,7 @@ from network.request_parser import RequestParser
 class Client:
 
     _request_parser = RequestParser()
+    _server = None
 
     def __init__(self, sock: socket.socket, ip: str = None, port: int = None):
         self.ip = ip or sock.getpeername()[0]
@@ -26,19 +27,30 @@ class Client:
     def get_requests(self):
         while True:
             msg = self.read_from_socket()
-            print(f'Handling request from {self.addr_str}')
-            print(f'Request: {msg}')
-            request_obj = self._request_parser.get_request_obj(client=self, request_string=msg)
-            print(request_obj)
-            if request_obj is not None:
-                resp = request_obj.execute()
-            else:
-                resp = INVALID_QUERY
-            print(resp)
-            self.write_to_socket(resp)
+            if msg is None:
+                self._server.delete_client(self)
+                return
+            self.handle_request(request=msg)
+
+    def handle_request(self, request):
+        print(f'Handling request from {self.addr_str}')
+        print(f'Request: {request}')
+        request_obj = self._request_parser.get_request_obj(client=self, request_string=request)
+        print(request_obj)
+        if request_obj is not None:
+            resp = request_obj.execute()
+        else:
+            resp = INVALID_QUERY
+        print(resp)
+        self.write_to_socket(resp)
 
     def read_from_socket(self):
-        encoded_msg = self._sock.recv(MSG_BUFF_SIZE)
+        try:
+            encoded_msg = self._sock.recv(MSG_BUFF_SIZE)
+        except (ConnectionAbortedError, ConnectionResetError):
+            return
+        if not encoded_msg:
+            return
         return encoded_msg.decode().strip()
 
     def write_to_socket(self, data: str | bytes):
@@ -48,3 +60,11 @@ class Client:
             msg = data
         msg = msg + b'\n'
         self._sock.send(msg)
+
+    @classmethod
+    def get_server(cls):
+        return cls._server
+
+    @classmethod
+    def set_server(cls, server):
+        cls._server = server

@@ -1,24 +1,30 @@
+from threading import Lock
+
+
 class DatabaseMeta(type):
 
     _dbs = []
     name_to_db = {}
     id_to_db = {}
 
+    _create_lock = Lock()
+
     def __call__(cls, *args, **kwargs):
-        name = kwargs.get('name')
-        if name in cls.name_to_db:
-            return cls.name_to_db[name]
+        with cls._create_lock:
+            name = kwargs.get('name')
+            if name in cls.name_to_db:
+                return cls.name_to_db[name]
 
-        _id = len(cls._dbs)
-        kwargs['id'] = _id
+            _id = len(cls._dbs)
+            kwargs['id'] = _id
 
-        db = super().__call__(*args, **kwargs)
+            db = super().__call__(*args, **kwargs)
 
-        cls._dbs.append(db)
-        cls.name_to_db[name] = db
-        cls.id_to_db[_id] = db
+            cls._dbs.append(db)
+            cls.name_to_db[name] = db
+            cls.id_to_db[_id] = db
 
-        return db
+            return db
 
     @classmethod
     def db_names(cls):

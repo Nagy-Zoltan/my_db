@@ -1,4 +1,5 @@
 from datetime import datetime
+from threading import Lock
 from typing import Any
 
 from database.model.consts import INVALID_KEY, NOT_SET, OK
@@ -6,6 +7,8 @@ from database.model.db_meta import DatabaseMeta
 
 
 class Database(metaclass=DatabaseMeta):
+
+    _set_data_lock = Lock()
 
     def __init__(self, name: str, **kwargs):
         self._name = name
@@ -52,25 +55,26 @@ class Database(metaclass=DatabaseMeta):
         return data
 
     def set_data(self, key: str, val: Any):
-        data = self._data
-        split_key = key.split('.')
+        with self._set_data_lock:
+            data = self._data
+            split_key = key.split('.')
 
-        for key in split_key[:-1]:
+            for key in split_key[:-1]:
+                try:
+                    _data = data
+                    data = data.get(key)
+                except AttributeError:
+                    return INVALID_KEY
+
+                if data is None and key not in _data:
+                    data = _data[key] = {}
+
+            last_key = split_key[-1]
             try:
-                _data = data
-                data = data.get(key)
-            except AttributeError:
+                data[last_key] = val
+                return OK
+            except TypeError:
                 return INVALID_KEY
-
-            if data is None and key not in _data:
-                data = _data[key] = {}
-
-        last_key = split_key[-1]
-        try:
-            data[last_key] = val
-            return OK
-        except TypeError:
-            return INVALID_KEY
 
     def __repr__(self):
         return f'Database(name={self._name}, id={self._id}, created_at={self.created_at}, created_by={self.created_by})'
