@@ -8,8 +8,7 @@ class CreateDBRequest(AbstractRequest):
         self.name = name
 
     def execute(self):
-        db = Database(name=self.name)
-        return repr(db)
+        return Database(name=self.name)
 
     def __repr__(self):
         return f'CreateDBRequest(name={self.name})'

@@ -10,12 +10,9 @@ class SetDBByNameRequest(AbstractRequest):
         self.name = name
 
     def execute(self):
-        try:
-            database = Database.name_to_db[self.name]
-            self.client.db = database
-            return repr(database)
-        except KeyError:
-            return DB_NOT_EXIST
+        self.client.db_selector = self.name
+        result = Database.get_database(self.name)
+        return result
 
     def __repr__(self):
         return f'SetDBByNameRequest(client={self.client.addr_str}, name={self.name})'

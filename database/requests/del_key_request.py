@@ -15,7 +15,7 @@ class DelKeyRequest(AbstractRequest):
             db = self.db
         else:
             self.db = db
-        return str(db.del_data(key=self.key))
+        return db.del_data(key=self.key)
 
     def __repr__(self):
         if self.db is not None:

@@ -35,7 +35,7 @@ class Database(metaclass=DatabaseMeta):
     def data(self):
         return self._data
 
-    def drop(self):
+    def clear(self):
         self._data.clear()
 
     def load(self, data: dict):
@@ -97,6 +97,12 @@ class Database(metaclass=DatabaseMeta):
                 return NOT_SET
             except TypeError:
                 return INVALID_KEY
+
+    def get_all(self):
+        return self._data
+
+    def __str__(self):
+        return repr(self)
 
     def __repr__(self):
         return f'Database(name={self._name}, id={self._id}, created_at={self.created_at}, created_by={self.created_by})'

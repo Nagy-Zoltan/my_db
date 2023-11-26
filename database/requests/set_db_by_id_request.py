@@ -10,12 +10,9 @@ class SetDBByIDRequest(AbstractRequest):
         self.id = id_
 
     def execute(self):
-        try:
-            database = Database.id_to_db[self.id]
-            self.client.db = database
-            return repr(database)
-        except KeyError:
-            return DB_NOT_EXIST
+        self.client.db_selector = self.id
+        result = Database.get_database(self.id)
+        return result
 
     def __repr__(self):
         return f'SetDBByIDRequest(client={self.client.addr_str}, id={self.id})'

@@ -1,5 +1,7 @@
 import socket
 
+from database.model.consts import DB_NOT_EXIST
+from database.model.db import Database
 from network.consts import INVALID_QUERY, MSG_BUFF_SIZE
 from network.request_parser import RequestParser
 
@@ -14,15 +16,21 @@ class Client:
         self.port = port or sock.getpeername()[1]
         self.addr_str = f'{ip}:{port}'
         self._sock = sock
-        self._db = None
+        self._db_selector = None
 
     @property
-    def db(self):
-        return self._db
+    def db_selector(self):
+        return self._db_selector
 
-    @db.setter
-    def db(self, database):
-        self._db = database
+    @db_selector.setter
+    def db_selector(self, db_selector):
+        self._db_selector = db_selector
+
+    def get_database(self):
+        result = Database.get_database(self._db_selector)
+        if result == DB_NOT_EXIST:
+            result = None
+        return result
 
     def get_requests(self):
         while True:
@@ -41,8 +49,9 @@ class Client:
             resp = request_obj.execute()
         else:
             resp = INVALID_QUERY
-        print(resp)
-        self.write_to_socket(resp)
+        resp_str = str(resp)
+        print(resp_str)
+        self.write_to_socket(resp_str)
 
     def read_from_socket(self):
         try:

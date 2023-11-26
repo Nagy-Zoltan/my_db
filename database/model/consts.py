@@ -1,3 +1,5 @@
+DB_NOT_EXIST = 'db does not exist'
+CANNOT_GET_DB = 'cannot get db'
 INVALID_KEY = 'invalid key'
 NOT_SET = 'not set'
 OK = 'ok'

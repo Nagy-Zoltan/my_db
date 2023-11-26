@@ -2,11 +2,10 @@ from database.requests.abstract_request import AbstractRequest
 from database.requests.consts import DB_NOT_SET
 
 
-class GetKeyRequest(AbstractRequest):
+class GetAllRequest(AbstractRequest):
 
-    def __init__(self, db=None, key: str = None):
+    def __init__(self, db=None):
         self.db = db
-        self.key = key
 
     def execute(self, db=None):
         if self.db is None and db is None:
@@ -15,10 +14,10 @@ class GetKeyRequest(AbstractRequest):
             db = self.db
         else:
             self.db = db
-        return db.get_data(key=self.key)
+        return db.get_all()
 
     def __repr__(self):
         if self.db is not None:
-            return f'GetKeyRequest(db={self.db.name}, key={self.key})'
+            return f'GetAllRequest(db={self.db.name})'
         else:
-            return f'GetKeyRequest(db={None}, key={self.key})'
+            return f'GetAllRequest(db={None})'
