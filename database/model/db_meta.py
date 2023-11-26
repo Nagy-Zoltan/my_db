@@ -67,24 +67,12 @@ class DatabaseMeta(type):
     def delete_database(cls, arg):
         pass
 
-    @classmethod
-    def _del_db_by_name(cls, db_name: str):
-        index = None
-        for i, db_iter in enumerate(cls._dbs):
-            if db_iter.name == db_name:
-                index = i
-                break
-        if index is not None:
-            del cls._dbs[index]
-
     @delete_database.register(str)
     def _(cls, db_name: str):
         with cls._lock:
             try:
                 db_id = cls.name_to_db[db_name].id
-                del cls.name_to_db[db_name]
-                del cls.id_to_db[db_id]
-                cls._del_db_by_name(db_name=db_name)
+                cls._delete_database(db_name=db_name, db_id=db_id)
                 return OK
             except KeyError:
                 return DB_NOT_EXIST
@@ -94,9 +82,19 @@ class DatabaseMeta(type):
         with cls._lock:
             try:
                 db_name = cls.id_to_db[db_id].name
-                del cls.name_to_db[db_name]
-                del cls.id_to_db[db_id]
-                cls._del_db_by_name(db_name=db_name)
+                cls._delete_database(db_name=db_name, db_id=db_id)
                 return OK
             except KeyError:
                 return DB_NOT_EXIST
+
+    @classmethod
+    def _delete_database(cls, db_name: str, db_id: int):
+        del cls.name_to_db[db_name]
+        del cls.id_to_db[db_id]
+        index = None
+        for i, db_iter in enumerate(cls._dbs):
+            if db_iter.name == db_name:
+                index = i
+                break
+        if index is not None:
+            del cls._dbs[index]
