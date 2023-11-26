@@ -8,7 +8,7 @@ from database.model.db_meta import DatabaseMeta
 
 class Database(metaclass=DatabaseMeta):
 
-    _set_data_lock = Lock()
+    _lock = Lock()
 
     def __init__(self, name: str, **kwargs):
         self._name = name
@@ -55,7 +55,7 @@ class Database(metaclass=DatabaseMeta):
         return data
 
     def set_data(self, key: str, val: Any):
-        with self._set_data_lock:
+        with self._lock:
             data = self._data
             split_key = key.split('.')
 
@@ -73,6 +73,28 @@ class Database(metaclass=DatabaseMeta):
             try:
                 data[last_key] = val
                 return OK
+            except TypeError:
+                return INVALID_KEY
+
+    def del_data(self, key: str):
+        with self._lock:
+            data = self._data
+            split_key = key.split('.')
+
+            for key in split_key[:-1]:
+                try:
+                    _data = data
+                    data = data.get(key)
+                except AttributeError:
+                    return INVALID_KEY
+                if data is None and key not in _data:
+                    return NOT_SET
+            last_key = split_key[-1]
+            try:
+                del data[last_key]
+                return OK
+            except KeyError:
+                return NOT_SET
             except TypeError:
                 return INVALID_KEY
 

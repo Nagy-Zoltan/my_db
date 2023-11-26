@@ -1,6 +1,7 @@
 import re
 
 from database.requests.create_db_request import CreateDBRequest
+from database.requests.del_key_request import DelKeyRequest
 from database.requests.get_key_request import GetKeyRequest
 from database.requests.request_type import RequestType
 from database.requests.set_db_by_id_request import SetDBByIDRequest
@@ -10,14 +11,15 @@ from database.requests.set_key_request import SetKeyRequest
 
 class RequestParser:
 
-    _KEY_PATTERN = r'\w+(.\w+)*'
+    _KEY_PATTERN = r'\w+(\.\w+)*'
 
     PATTERNS = {
         RequestType.CREATE_DB: re.compile(r'^[dD][bB] [cC][rR][eE][aA][tT][eE] \w+$'),
         RequestType.SET_DB_BY_ID: re.compile(r'^[dD][bB] [iI][dD] \d+$'),
         RequestType.SET_DB_BY_NAME: re.compile(r'^[dD][bB] [nN][aA][mM][eE] \w+$'),
         RequestType.GET_KEY_FROM_DB: re.compile(fr'^[gG][eE][tT] {_KEY_PATTERN}$'),
-        RequestType.SET_KEY_IN_DB: re.compile(fr'^[sS][eE][tT] {_KEY_PATTERN} .+?$')
+        RequestType.SET_KEY_IN_DB: re.compile(fr'^[sS][eE][tT] {_KEY_PATTERN} .+?$'),
+        RequestType.DEL_KEY_IN_DB: re.compile(fr'^[dD][eE][lL] {_KEY_PATTERN}$')
     }
 
     def get_request_type(self, request_string):
@@ -42,3 +44,6 @@ class RequestParser:
         if request_type == RequestType.SET_KEY_IN_DB:
             key_name, val_name = request_string.split(maxsplit=2)[-2:]
             return SetKeyRequest(db=client.db, key=key_name, val=val_name)
+        if request_type == RequestType.DEL_KEY_IN_DB:
+            key_name = request_string.split(maxsplit=1)[-1]
+            return DelKeyRequest(db=client.db, key=key_name)
