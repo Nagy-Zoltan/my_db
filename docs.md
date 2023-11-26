@@ -12,6 +12,14 @@ Create new database:
 ```commandline
 db create "database name"
 ```
+Delete database by name:
+```commandline
+db drop name "database name"
+```
+Delete database by id:
+```commandline
+db drop id "database id"
+```
 Switch to database by name:
 ```commandline
 db name "database name"
@@ -28,6 +36,15 @@ Set key in database:
 ```commandline
 set "key name" "value"
 ```
+Delete key in database:
+```commandline
+del "key name"
+```
+Get all keys in database:
+```commandline
+getall
+```
+
 
 ## Examples
 
