@@ -17,15 +17,15 @@ class RequestParser:
     _KEY_PATTERN = r'\w+(\.\w+)*'
 
     PATTERNS = {
-        RequestType.CREATE_DB: re.compile(r'^[dD][bB] [cC][rR][eE][aA][tT][eE] \w+$'),
-        RequestType.SET_DB_BY_ID: re.compile(r'^[dD][bB] [iI][dD] \d+$'),
-        RequestType.SET_DB_BY_NAME: re.compile(r'^[dD][bB] [nN][aA][mM][eE] \w+$'),
-        RequestType.GET_KEY_FROM_DB: re.compile(fr'^[gG][eE][tT] {_KEY_PATTERN}$'),
-        RequestType.SET_KEY_IN_DB: re.compile(fr'^[sS][eE][tT] {_KEY_PATTERN} .+?$'),
-        RequestType.DEL_KEY_IN_DB: re.compile(fr'^[dD][eE][lL] {_KEY_PATTERN}$'),
-        RequestType.GET_ALL_FROM_DB: re.compile(r'^[gG][eE][tT][aA][lL][lL]$'),
-        RequestType.DROP_DB_BY_NAME: re.compile(r'^[dD][bB] [dD][rR][oO][pP] [nN][aA][mM][eE] \w+$'),
-        RequestType.DROP_DB_BY_ID: re.compile(r'^[dD][bB] [dD][rR][oO][pP] [iI][dD] \d+$')
+        RequestType.CREATE_DB: re.compile(r'^db create \w+$', re.IGNORECASE),
+        RequestType.SET_DB_BY_ID: re.compile(r'^db id \d+$', re.IGNORECASE),
+        RequestType.SET_DB_BY_NAME: re.compile(r'^db name \w+$', re.IGNORECASE),
+        RequestType.GET_KEY_FROM_DB: re.compile(fr'^get {_KEY_PATTERN}$', re.IGNORECASE),
+        RequestType.SET_KEY_IN_DB: re.compile(fr'^set {_KEY_PATTERN} .+?$', re.IGNORECASE),
+        RequestType.DEL_KEY_IN_DB: re.compile(fr'^del {_KEY_PATTERN}$', re.IGNORECASE),
+        RequestType.GET_ALL_FROM_DB: re.compile(r'^getall$', re.IGNORECASE),
+        RequestType.DROP_DB_BY_NAME: re.compile(r'^db drop name \w+$', re.IGNORECASE),
+        RequestType.DROP_DB_BY_ID: re.compile(r'^db drop id \d+$', re.IGNORECASE)
     }
 
     def get_request_type(self, request_string):
